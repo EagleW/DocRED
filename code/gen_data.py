@@ -26,7 +26,7 @@ test_file_name = os.path.join(in_path, 'test.json')
 # bert-base-cased: 12-layer, 768-hidden, 12-heads , 110M parameters
 # bert-base-multilingual: 102 languages, 12-layer, 768-hidden, 12-heads, 110M parameters
 # bert-base-chinese: Chinese Simplified and Traditional, 12-layer, 768-hidden, 12-heads, 110M parameters
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased-pytorch_model.bin')
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 
 rel2id = json.load(open(os.path.join(out_path, 'rel2id.json'), "r"))
