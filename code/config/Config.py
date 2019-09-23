@@ -139,7 +139,7 @@ class Config(object):
 		prefix = self.train_prefix
 
 		print ('train', prefix)
-		self.data_train_bert = np.load(os.path.join(self.data_path, prefix+'_word.npy'))
+		self.data_train_bert = np.load(os.path.join(self.data_path, prefix+'_bert_word.npy'))
 		self.data_train_word = np.load(os.path.join(self.data_path, prefix+'_word.npy'))
 		self.data_train_pos = np.load(os.path.join(self.data_path, prefix+'_pos.npy'))
 		self.data_train_ner = np.load(os.path.join(self.data_path, prefix+'_ner.npy'))
@@ -166,6 +166,7 @@ class Config(object):
 		prefix = self.test_prefix
 		print (prefix)
 		self.is_test = ('dev_test' == prefix)
+		self.data_test_bert = np.load(os.path.join(self.data_path, prefix+'_bert_word.npy'))
 		self.data_test_word = np.load(os.path.join(self.data_path, prefix+'_word.npy'))
 		self.data_test_pos = np.load(os.path.join(self.data_path, prefix+'_pos.npy'))
 		self.data_test_ner = np.load(os.path.join(self.data_path, prefix+'_ner.npy'))
@@ -228,7 +229,8 @@ class Config(object):
 
 
 			for i, index in enumerate(cur_batch):
-				context_idxs[i].copy_(torch.from_numpy(self.data_train_word[index, :]))
+				context_idxs[i].copy_(torch.from_numpy(self.data_train_bert[index, :]))
+				# context_idxs[i].copy_(torch.from_numpy(self.data_train_word[index, :]))
 				context_pos[i].copy_(torch.from_numpy(self.data_train_pos[index, :]))
 				context_char_idxs[i].copy_(torch.from_numpy(self.data_train_char[index, :]))
 				context_ner[i].copy_(torch.from_numpy(self.data_train_ner[index, :]))
@@ -351,7 +353,8 @@ class Config(object):
 			titles = []
 			indexes = []
 			for i, index in enumerate(cur_batch):
-				context_idxs[i].copy_(torch.from_numpy(self.data_test_word[index, :]))
+				context_idxs[i].copy_(torch.from_numpy(self.data_test_bert[index, :]))
+				# context_idxs[i].copy_(torch.from_numpy(self.data_test_word[index, :]))
 				context_pos[i].copy_(torch.from_numpy(self.data_test_pos[index, :]))
 				context_char_idxs[i].copy_(torch.from_numpy(self.data_test_char[index, :]))
 				context_ner[i].copy_(torch.from_numpy(self.data_test_ner[index, :]))
