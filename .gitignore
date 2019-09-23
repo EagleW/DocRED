@@ -107,3 +107,4 @@ data/
 prepro_data/
 .idea/
 *.bin
+code/prepro_data
