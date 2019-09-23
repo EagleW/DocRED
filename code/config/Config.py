@@ -61,6 +61,8 @@ class Config(object):
 
 		self.checkpoint_dir = './checkpoint'
 		self.fig_result_dir = './fig_result'
+
+		self.bert_dir = 'bert-base-uncased'
 		# Otherwise if you want to download the model by yourself from url provided by following
 		# https://github.com/huggingface/pytorch-transformers/blob/4fc9f9ef54e2ab250042c55b55a2e3c097858cb7/pytorch_transformers/modeling_bert.py
 		# bert model directory, you need to change the download model name,
@@ -78,7 +80,7 @@ class Config(object):
 
 		self.period = 50
 
-		self.batch_size = 4
+		self.batch_size = 12
 		self.h_t_limit = 1800
 
 		self.test_batch_size = self.batch_size

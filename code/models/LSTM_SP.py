@@ -24,7 +24,7 @@ class LSTM_SP(nn.Module):
 
 		# bert pretrain
 		self.bert_pretrain = BertModel.from_pretrained(config.bert_dir)
-		for param in self.bert_pretrain.features.parameters():
+		for param in self.bert_pretrain.parameters():
 			param.requires_grad = False
 
 
