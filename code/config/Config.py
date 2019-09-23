@@ -61,6 +61,8 @@ class Config(object):
 
 		self.checkpoint_dir = './checkpoint'
 		self.fig_result_dir = './fig_result'
+		# bert model location
+		self.bert_dir = './bert-base-uncased-pytorch_model.bin'
 		self.test_epoch = 5
 		self.pretrain_model = None
 
@@ -137,6 +139,7 @@ class Config(object):
 		prefix = self.train_prefix
 
 		print ('train', prefix)
+		self.data_train_bert = np.load(os.path.join(self.data_path, prefix+'_word.npy'))
 		self.data_train_word = np.load(os.path.join(self.data_path, prefix+'_word.npy'))
 		self.data_train_pos = np.load(os.path.join(self.data_path, prefix+'_pos.npy'))
 		self.data_train_ner = np.load(os.path.join(self.data_path, prefix+'_ner.npy'))

@@ -106,3 +106,4 @@ venv.bak/
 data/
 prepro_data/
 .idea/
+*.bin

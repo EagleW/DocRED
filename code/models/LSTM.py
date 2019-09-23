@@ -9,6 +9,7 @@ import numpy as np
 import math
 from torch.nn import init
 from torch.nn.utils import rnn
+from pytorch_transformers import BertModel
 
 
 class LSTM(nn.Module):

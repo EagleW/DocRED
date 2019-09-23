@@ -184,7 +184,7 @@ def init(data_file_name, rel2id, max_length = 512, is_training = True, suffix=''
 
 		# default bert [pad] is 0
 		sen_bert_word = sen_bert_word + [0] * (max_length - len(sen_bert_word))
-		
+
 		for j in range(j + 1, max_length):
 			sen_word[i][j] = word2id['BLANK']
 

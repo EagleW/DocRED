@@ -9,6 +9,7 @@ import numpy as np
 import math
 from torch.nn import init
 from torch.nn.utils import rnn
+from pytorch_transformers import BertModel
 
 
 class BiLSTM(nn.Module):
@@ -16,11 +17,15 @@ class BiLSTM(nn.Module):
 		super(BiLSTM, self).__init__()
 		self.config = config
 
-		word_vec_size = config.data_word_vec.shape[0]
-		self.word_emb = nn.Embedding(word_vec_size, config.data_word_vec.shape[1])
-		self.word_emb.weight.data.copy_(torch.from_numpy(config.data_word_vec))
+		# word_vec_size = config.data_word_vec.shape[0]
+		# self.word_emb = nn.Embedding(word_vec_size, config.data_word_vec.shape[1])
+		# self.word_emb.weight.data.copy_(torch.from_numpy(config.data_word_vec))
+		#
+		# self.word_emb.weight.requires_grad = False
 
-		self.word_emb.weight.requires_grad = False
+		# bert pretrain
+		self.bert_pretrain = BertModel.from_pretrained(config.bert_dir)
+
 		self.use_entity_type = True
 		self.use_coreference = True
 		self.use_distance = True
@@ -34,7 +39,10 @@ class BiLSTM(nn.Module):
 		# self.char_cnn = nn.Conv1d(char_dim,  char_hidden, 5)
 
 		hidden_size = 128
-		input_size = config.data_word_vec.shape[1]
+
+		# bert hidden size
+		input_size = self.bert_pretrain.config.hidden_size
+		# input_size = config.data_word_vec.shape[1]
 		if self.use_entity_type:
 			input_size += config.entity_type_size
 			self.ner_emb = nn.Embedding(7, config.entity_type_size, padding_idx=0)
@@ -61,7 +69,12 @@ class BiLSTM(nn.Module):
 		# context_ch = self.char_emb(context_char_idxs.contiguous().view(-1, char_size)).view(bsz * para_size, char_size, -1)
 		# context_ch = self.char_cnn(context_ch.permute(0, 2, 1).contiguous()).max(dim=-1)[0].view(bsz, para_size, -1)
 
-		sent = self.word_emb(context_idxs)
+		# sent = self.word_emb(context_idxs)
+
+		with torch.no_grad():
+			outputs = self.bert_pretrain(context_idxs)
+			sent = outputs[0]
+
 		if self.use_coreference:
 			sent = torch.cat([sent, self.entity_embed(pos)], dim=-1)
 
