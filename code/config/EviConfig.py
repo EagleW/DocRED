@@ -38,7 +38,7 @@ class Accuracy(object):
 			return float(self.correct) / self.total
 	def clear(self):
 		self.correct = 0
-		self.total = 0 
+		self.total = 0
 
 class EviConfig(object):
 	def __init__(self, args):
@@ -65,6 +65,13 @@ class EviConfig(object):
 		self.test_epoch = 5
 		self.pretrain_model = None
 
+		self.bert_dir = 'bert-base-uncased'
+		# Otherwise if you want to download the model by yourself from url provided by following, you can comment self.bert_dir = './'
+		# https://github.com/huggingface/pytorch-transformers/blob/4fc9f9ef54e2ab250042c55b55a2e3c097858cb7/pytorch_transformers/modeling_bert.py
+		# bert model directory, you need to change the download model name,
+		# e.g. bert-base-uncased-pytorch_model.bin to pytorch_model.bin
+		# you also need to download config file and rename it to config.json
+		self.bert_dir = './'
 
 		self.word_size = 100
 		self.epoch_range = None
@@ -130,11 +137,12 @@ class EviConfig(object):
 		self.use_gpu = use_gpu
 	def set_epoch_range(self, epoch_range):
 		self.epoch_range = epoch_range
-	
+
 	def load_train_data(self):
 		print("Reading training data...")
 
 		prefix = 'dev_train'
+		self.data_train_bert = np.load(os.path.join(self.data_path, prefix+'_bert_word.npy'))
 		self.data_train_word = np.load(os.path.join(self.data_path, prefix+'_word.npy'))
 		self.data_train_pos = np.load(os.path.join(self.data_path, prefix+'_pos.npy'))
 		self.data_train_ner = np.load(os.path.join(self.data_path, prefix+'_ner.npy'))
@@ -154,13 +162,14 @@ class EviConfig(object):
 	def load_test_data(self):
 		print("Reading testing data...")
 
-		self.data_char_vec = np.load(os.path.join(self.data_path, 'char_vec.npy'))
+        self.data_char_vec = np.load(os.path.join(self.data_path, 'char_vec.npy'))
 		self.data_word_vec = np.load(os.path.join(self.data_path, 'vec.npy'))
 		self.rel2id = json.load(open(os.path.join(self.data_path, 'rel2id.json')))
 		self.id2rel = {v: k for k,v in self.rel2id.items()}
 
 		prefix = self.test_prefix
 		print (prefix)
+        self.data_test_bert = np.load(os.path.join(self.data_path, prefix+'_bert_word.npy'))
 		self.data_test_word = np.load(os.path.join(self.data_path, prefix+'_word.npy'))
 		self.data_test_pos = np.load(os.path.join(self.data_path, prefix+'_pos.npy'))
 		self.data_test_ner = np.load(os.path.join(self.data_path, prefix+'_ner.npy'))
@@ -240,7 +249,9 @@ class EviConfig(object):
 				max_sents = max(max_sents, len(Ls) - 1)
 				random.shuffle(ins['labels'])
 				for label in ins['labels']:
-					context_idxs[i].copy_(torch.from_numpy(self.data_train_word[index, :]))
+
+        			context_idxs[i].copy_(torch.from_numpy(self.data_train_bert[index, :]))
+					# context_idxs[i].copy_(torch.from_numpy(self.data_train_word[index, :]))
 					context_char_idxs[i].copy_(torch.from_numpy(self.data_train_char[index, :]))
 					context_ner[i].copy_(torch.from_numpy(self.data_train_ner[index, :]))
 					relation_label[i] = label['r']
@@ -343,6 +354,7 @@ class EviConfig(object):
 				max_sents = max(max_sents, len(Ls) - 1)
 				infos.append((ins['title'], h_idx, t_idx, self.id2rel[r]))
 
+                context_idxs[i].copy_(torch.from_numpy(self.data_test_bert[index, :]))
 
 				context_idxs[i].copy_(torch.from_numpy(self.data_test_word[index, :]))
 				context_char_idxs[i].copy_(torch.from_numpy(self.data_test_char[index, :]))
@@ -588,4 +600,3 @@ class EviConfig(object):
 		model.cuda()
 		model.eval()
 		self.test(model, model_name, True, input_theta)
-

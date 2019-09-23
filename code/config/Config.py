@@ -37,7 +37,7 @@ class Accuracy(object):
 			return float(self.correct) / self.total
 	def clear(self):
 		self.correct = 0
-		self.total = 0 
+		self.total = 0
 
 class Config(object):
 	def __init__(self, args):
@@ -63,7 +63,7 @@ class Config(object):
 		self.fig_result_dir = './fig_result'
 
 		self.bert_dir = 'bert-base-uncased'
-		# Otherwise if you want to download the model by yourself from url provided by following
+		# Otherwise if you want to download the model by yourself from url provided by following, you can comment self.bert_dir = './'
 		# https://github.com/huggingface/pytorch-transformers/blob/4fc9f9ef54e2ab250042c55b55a2e3c097858cb7/pytorch_transformers/modeling_bert.py
 		# bert model directory, you need to change the download model name,
 		# e.g. bert-base-uncased-pytorch_model.bin to pytorch_model.bin
@@ -139,7 +139,7 @@ class Config(object):
 		self.use_gpu = use_gpu
 	def set_epoch_range(self, epoch_range):
 		self.epoch_range = epoch_range
-	
+
 	def load_train_data(self):
 		print("Reading training data...")
 		prefix = self.train_prefix
