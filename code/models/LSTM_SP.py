@@ -24,6 +24,9 @@ class LSTM_SP(nn.Module):
 
 		# bert pretrain
 		self.bert_pretrain = BertModel.from_pretrained(config.bert_dir)
+		for param in self.bert_pretrain.features.parameters():
+			param.requires_grad = False
+
 
 		# char_size = config.data_char_vec.shape[0]
 		# self.char_emb = nn.Embedding(char_size, config.data_char_vec.shape[1])

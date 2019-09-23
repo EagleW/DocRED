@@ -61,8 +61,12 @@ class Config(object):
 
 		self.checkpoint_dir = './checkpoint'
 		self.fig_result_dir = './fig_result'
-		# bert model location
-		self.bert_dir = './bert-base-uncased-pytorch_model.bin'
+		# Otherwise if you want to download the model by yourself from url provided by following
+		# https://github.com/huggingface/pytorch-transformers/blob/4fc9f9ef54e2ab250042c55b55a2e3c097858cb7/pytorch_transformers/modeling_bert.py
+		# bert model directory, you need to change the download model name,
+		# e.g. bert-base-uncased-pytorch_model.bin to pytorch_model.bin
+		# you also need to download config file and rename it to config.json
+		self.bert_dir = './'
 		self.test_epoch = 5
 		self.pretrain_model = None
 

@@ -108,3 +108,5 @@ prepro_data/
 .idea/
 *.bin
 code/prepro_data
+*.json
+code/log/

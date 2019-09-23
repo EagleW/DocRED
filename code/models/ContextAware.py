@@ -9,15 +9,21 @@ import numpy as np
 import math
 from torch.nn import init
 from torch.nn.utils import rnn
+from pytorch_transformers import BertModel
 
 
 class ContextAware(nn.Module):
 	def __init__(self, config):
 		super(ContextAware, self).__init__()
 		self.config = config
-		self.word_emb = nn.Embedding(config.data_word_vec.shape[0], config.data_word_vec.shape[1])
-		self.word_emb.weight.data.copy_(torch.from_numpy(config.data_word_vec))
-		self.word_emb.weight.requires_grad = False
+		# self.word_emb = nn.Embedding(config.data_word_vec.shape[0], config.data_word_vec.shape[1])
+		# self.word_emb.weight.data.copy_(torch.from_numpy(config.data_word_vec))
+		# self.word_emb.weight.requires_grad = False
+
+		# bert pretrain
+		self.bert_pretrain = BertModel.from_pretrained(config.bert_dir)
+		for param in self.bert_pretrain.features.parameters():
+			param.requires_grad = False
 
 		self.ner_emb = nn.Embedding(7, config.entity_type_size, padding_idx=0)
 
@@ -30,7 +36,9 @@ class ContextAware(nn.Module):
 		# self.char_cnn = nn.Conv1d(char_dim,  char_hidden, 5)
 
 		hidden_size = 128
-		input_size = config.data_word_vec.shape[1] + config.coref_size + config.entity_type_size #+ char_hidden
+		# change to bert hidden
+		input_size = self.bert_pretrain.config.hidden_size + config.coref_size + config.entity_type_size
+		# input_size = config.data_word_vec.shape[1] + config.coref_size + config.entity_type_size #+ char_hidden
 
 
 		self.rnn = EncoderLSTM(input_size, hidden_size, 1, True, True, 1 - config.keep_prob, False)

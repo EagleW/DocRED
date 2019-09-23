@@ -179,11 +179,10 @@ def init(data_file_name, rel2id, max_length = 512, is_training = True, suffix=''
 					break
 				sen_char[i,j,c_idx] = char2id.get(k, char2id['UNK'])
 
-		# start tokenize
-		sen_bert_word = tokenizer.convert_tokens_to_ids(words[:max_length])
+		# start tokenize bert, default bert [pad] is 0
+		tmp = tokenizer.convert_tokens_to_ids(words[:max_length])
 
-		# default bert [pad] is 0
-		sen_bert_word = sen_bert_word + [0] * (max_length - len(sen_bert_word))
+		sen_bert_word[i] = np.array(tmp+ [0] * (max_length - len(tmp)), dtype=np.int64)
 
 		for j in range(len(words), max_length):
 			sen_word[i][j] = word2id['BLANK']
