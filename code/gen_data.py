@@ -1,8 +1,9 @@
 import numpy as np
 import os
 import json
-from nltk.tokenize import WordPunctTokenizer
 import argparse
+# using hugging face implementation
+from pytorch_transformers import BertTokenizer
 parser = argparse.ArgumentParser()
 parser.add_argument('--in_path', type = str, default =  "../data")
 parser.add_argument('--out_path', type = str, default = "prepro_data")
@@ -18,6 +19,16 @@ train_annotated_file_name = os.path.join(in_path, 'train_annotated.json')
 dev_file_name = os.path.join(in_path, 'dev.json')
 test_file_name = os.path.join(in_path, 'test.json')
 
+# add bert initialization
+# you can choose
+# bert-base-uncased: 12-layer, 768-hidden, 12-heads, 110M parameters
+# bert-large-uncased: 24-layer, 1024-hidden, 16-heads, 340M parameters
+# bert-base-cased: 12-layer, 768-hidden, 12-heads , 110M parameters
+# bert-base-multilingual: 102 languages, 12-layer, 768-hidden, 12-heads, 110M parameters
+# bert-base-chinese: Chinese Simplified and Traditional, 12-layer, 768-hidden, 12-heads, 110M parameters
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+
 rel2id = json.load(open(os.path.join(out_path, 'rel2id.json'), "r"))
 id2rel = {v:u for u,v in rel2id.items()}
 json.dump(id2rel, open(os.path.join(out_path, 'id2rel.json'), "w"))
@@ -32,7 +43,6 @@ def init(data_file_name, rel2id, max_length = 512, is_training = True, suffix=''
 	Ma = 0
 	Ma_e = 0
 	data = []
-	intrain = notintrain = notindevtrain = indevtrain = 0
 	for i in range(len(ori_data)):
 		Ls = [0]
 		L = 0
@@ -142,6 +152,8 @@ def init(data_file_name, rel2id, max_length = 512, is_training = True, suffix=''
 	ner2id = json.load(open(os.path.join(out_path, "ner2id.json")))
 
 	sen_tot = len(ori_data)
+	# sen_bert store b
+	sen_bert_word = np.zeros((sen_tot, max_length), dtype = np.int64)
 	sen_word = np.zeros((sen_tot, max_length), dtype = np.int64)
 	sen_pos = np.zeros((sen_tot, max_length), dtype = np.int64)
 	sen_ner = np.zeros((sen_tot, max_length), dtype = np.int64)
@@ -167,6 +179,12 @@ def init(data_file_name, rel2id, max_length = 512, is_training = True, suffix=''
 					break
 				sen_char[i,j,c_idx] = char2id.get(k, char2id['UNK'])
 
+		# start tokenize
+		sen_bert_word = tokenizer.convert_tokens_to_ids(words[:max_length])
+
+		# default bert [pad] is 0
+		sen_bert_word = sen_bert_word + [0] * (max_length - len(sen_bert_word))
+		
 		for j in range(j + 1, max_length):
 			sen_word[i][j] = word2id['BLANK']
 
@@ -178,6 +196,8 @@ def init(data_file_name, rel2id, max_length = 512, is_training = True, suffix=''
 				sen_ner[i][v['pos'][0]:v['pos'][1]] = ner2id[v['type']]
 
 	print("Finishing processing")
+	# save bert
+	np.save(os.path.join(out_path, name_prefix + suffix + '_bert_word.npy'), sen_bert_word)
 	np.save(os.path.join(out_path, name_prefix + suffix + '_word.npy'), sen_word)
 	np.save(os.path.join(out_path, name_prefix + suffix + '_pos.npy'), sen_pos)
 	np.save(os.path.join(out_path, name_prefix + suffix + '_ner.npy'), sen_ner)
