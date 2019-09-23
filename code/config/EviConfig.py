@@ -162,14 +162,14 @@ class EviConfig(object):
 	def load_test_data(self):
 		print("Reading testing data...")
 
-        self.data_char_vec = np.load(os.path.join(self.data_path, 'char_vec.npy'))
+		self.data_char_vec = np.load(os.path.join(self.data_path, 'char_vec.npy'))
 		self.data_word_vec = np.load(os.path.join(self.data_path, 'vec.npy'))
 		self.rel2id = json.load(open(os.path.join(self.data_path, 'rel2id.json')))
 		self.id2rel = {v: k for k,v in self.rel2id.items()}
 
 		prefix = self.test_prefix
 		print (prefix)
-        self.data_test_bert = np.load(os.path.join(self.data_path, prefix+'_bert_word.npy'))
+		self.data_test_bert = np.load(os.path.join(self.data_path, prefix+'_bert_word.npy'))
 		self.data_test_word = np.load(os.path.join(self.data_path, prefix+'_word.npy'))
 		self.data_test_pos = np.load(os.path.join(self.data_path, prefix+'_pos.npy'))
 		self.data_test_ner = np.load(os.path.join(self.data_path, prefix+'_ner.npy'))
@@ -250,7 +250,7 @@ class EviConfig(object):
 				random.shuffle(ins['labels'])
 				for label in ins['labels']:
 
-        			context_idxs[i].copy_(torch.from_numpy(self.data_train_bert[index, :]))
+					context_idxs[i].copy_(torch.from_numpy(self.data_train_bert[index, :]))
 					# context_idxs[i].copy_(torch.from_numpy(self.data_train_word[index, :]))
 					context_char_idxs[i].copy_(torch.from_numpy(self.data_train_char[index, :]))
 					context_ner[i].copy_(torch.from_numpy(self.data_train_ner[index, :]))
@@ -354,7 +354,7 @@ class EviConfig(object):
 				max_sents = max(max_sents, len(Ls) - 1)
 				infos.append((ins['title'], h_idx, t_idx, self.id2rel[r]))
 
-                context_idxs[i].copy_(torch.from_numpy(self.data_test_bert[index, :]))
+				context_idxs[i].copy_(torch.from_numpy(self.data_test_bert[index, :]))
 
 				context_idxs[i].copy_(torch.from_numpy(self.data_test_word[index, :]))
 				context_char_idxs[i].copy_(torch.from_numpy(self.data_test_char[index, :]))
