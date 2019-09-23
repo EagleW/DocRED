@@ -74,7 +74,7 @@ class Config(object):
 
 		self.period = 50
 
-		self.batch_size = 40
+		self.batch_size = 4
 		self.h_t_limit = 1800
 
 		self.test_batch_size = self.batch_size

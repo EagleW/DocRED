@@ -17,10 +17,13 @@ class LSTM_SP(nn.Module):
 		super(LSTM_SP, self).__init__()
 		self.config = config
 
-		word_vec_size = config.data_word_vec.shape[0]
-		self.word_emb = nn.Embedding(word_vec_size, config.data_word_vec.shape[1])
-		self.word_emb.weight.data.copy_(torch.from_numpy(config.data_word_vec))
-		self.word_emb.weight.requires_grad = False
+		# word_vec_size = config.data_word_vec.shape[0]
+		# self.word_emb = nn.Embedding(word_vec_size, config.data_word_vec.shape[1])
+		# self.word_emb.weight.data.copy_(torch.from_numpy(config.data_word_vec))
+		# self.word_emb.weight.requires_grad = False
+
+		# bert pretrain
+		self.bert_pretrain = BertModel.from_pretrained(config.bert_dir)
 
 		# char_size = config.data_char_vec.shape[0]
 		# self.char_emb = nn.Embedding(char_size, config.data_char_vec.shape[1])
@@ -32,9 +35,11 @@ class LSTM_SP(nn.Module):
 		self.coref_embed = nn.Embedding(config.max_length, config.coref_size, padding_idx=0)
 		self.ner_emb = nn.Embedding(7, config.entity_type_size, padding_idx=0)
 
-
 		hidden_size = 128
-		input_size = config.data_word_vec.shape[1] + config.coref_size + config.entity_type_size# + char_hidden
+
+		# change to bert hidden
+		input_size = self.bert_pretrain.config.hidden_size + config.coref_size + config.entity_type_size
+		# input_size = config.data_word_vec.shape[1] + config.coref_size + config.entity_type_size# + char_hidden
 
 		self.rnn = EncoderLSTM(input_size, hidden_size, 1, True, True, 1 - config.keep_prob, False)
 
@@ -52,7 +57,12 @@ class LSTM_SP(nn.Module):
 		# context_ch = self.char_emb(context_char_idxs.contiguous().view(-1, char_size)).view(bsz * para_size, char_size, -1)
 		# context_ch = self.char_cnn(context_ch.permute(0, 2, 1).contiguous()).max(dim=-1)[0].view(bsz, para_size, -1)
 
-		sent = torch.cat([self.word_emb(context_idxs) , self.coref_embed(pos), self.ner_emb(context_ner)], dim=-1)
+		with torch.no_grad():
+			outputs = self.bert_pretrain(context_idxs)
+			bert = outputs[0]
+
+		sent = torch.cat([bert, self.coref_embed(pos), self.ner_emb(context_ner)], dim=-1)
+		# sent = torch.cat([self.word_emb(context_idxs) , self.coref_embed(pos), self.ner_emb(context_ner)], dim=-1)
 
 		el = sent_h_mapping.size(1)
 		re_embed = (self.relation_embed(relation_label).unsqueeze(1)).expand(-1, el, -1)
