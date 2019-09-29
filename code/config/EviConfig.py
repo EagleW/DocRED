@@ -71,7 +71,7 @@ class EviConfig(object):
 		# bert model directory, you need to change the download model name,
 		# e.g. bert-base-uncased-pytorch_model.bin to pytorch_model.bin
 		# you also need to download config file and rename it to config.json
-		self.bert_dir = './'
+		# self.bert_dir = './'
 
 		self.word_size = 100
 		self.epoch_range = None
